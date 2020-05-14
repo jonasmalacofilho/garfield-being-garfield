@@ -8,6 +8,9 @@ from PyQt5.QtWidgets import *
 from ui.main import Ui_MainWindow
 
 
+RESOURCES = os.path.join(os.path.dirname(__file__), 'resources')
+
+
 class Strip:
     BASE_URL = 'https://d1ejxu6vysztl5.cloudfront.net/comics/garfield/{year:04d}/{year:04d}-{month:02d}-{day:02d}.gif'
 
@@ -102,6 +105,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.setupUi(self)
+        self.setWindowIcon(QIcon(os.path.join(RESOURCES, 'icons/app.png')))
 
         self.progress_bar = QProgressBar()
         self.progress_bar.hide()
