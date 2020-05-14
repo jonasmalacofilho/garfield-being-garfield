@@ -1,3 +1,2 @@
-__pycache__/
-/data/
-ui/*.py
+__pycache__
+pooky/ui/*.py

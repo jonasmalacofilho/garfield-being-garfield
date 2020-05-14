@@ -4,19 +4,22 @@ import requests
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
+import appdirs
 
-from ui.main import Ui_MainWindow
+from pooky.ui.main import Ui_MainWindow
 
 
-RESOURCES = os.path.join(os.path.dirname(__file__), 'resources')
+RESOURCES = os.path.join(os.path.dirname(__file__))
+USER_DATA = appdirs.user_data_dir('pookys-diary')
 
 
 class Strip:
-    BASE_URL = 'https://d1ejxu6vysztl5.cloudfront.net/comics/garfield/{year:04d}/{year:04d}-{month:02d}-{day:02d}.gif'
+    REMOTE_URL = 'https://d1ejxu6vysztl5.cloudfront.net/comics/garfield/{year:04d}/{year:04d}-{month:02d}-{day:02d}.gif'
+    LOCAL_DIR = os.path.join(USER_DATA, 'strips')
 
     def __init__(self, date):
         self.date = date
-        self.path = f'data/strips/{date.year()}/{date.toString(Qt.ISODate)}.gif'
+        self.path = os.path.join(self.LOCAL_DIR, f'{date.year()}/{date.toString(Qt.ISODate)}.gif')
 
     def is_available(self):
         return os.path.isfile(self.path)
@@ -31,7 +34,7 @@ class Strip:
         if self.is_available():
             return
         os.makedirs(os.path.dirname(self.path), exist_ok=True)
-        url = self.BASE_URL.format(year=self.date.year(), month=self.date.month(), day=self.date.day())
+        url = self.REMOTE_URL.format(year=self.date.year(), month=self.date.month(), day=self.date.day())
         req = requests.get(url)
         if req.status_code != 200:
             raise Exception('fuck')  # FIXME
@@ -49,11 +52,10 @@ class Strip:
 
     @classmethod
     def find_last(cls):
-        prefix = 'data/strips'
-        if not os.path.isdir(prefix):
+        if not os.path.isdir(cls.LOCAL_DIR):
             return None
-        for year in sorted(os.listdir(prefix), reverse=True):
-            for gif in sorted(os.listdir(os.path.join(prefix, year)), reverse=True):
+        for year in sorted(os.listdir(cls.LOCAL_DIR), reverse=True):
+            for gif in sorted(os.listdir(os.path.join(cls.LOCAL_DIR, year)), reverse=True):
                 date, ext = os.path.splitext(gif)
                 if ext == '.gif':
                     return cls(QDate.fromString(date, Qt.ISODate))
@@ -115,7 +117,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.statusBar.addWidget(self.progress_bar)
         self.statusBar.addWidget(self.cancel_button)
-        self.statusBar.addPermanentWidget(QLabel('v0.0.1'))
+        self.statusBar.addPermanentWidget(QLabel('v0.0.2'))
 
         self.setWindowFlags(
             Qt.Window |
@@ -194,8 +196,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         super().closeEvent(event)
 
 
-if __name__ == '__main__':
+def main():
     app = QApplication([])
     main = MainWindow()
     main.show()
     app.exec_()
+
+
+if __name__ == '__main__':
+    main()
