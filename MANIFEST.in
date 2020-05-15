@@ -1,1 +1,2 @@
 include pooky/icons/*.png
+include pooky/ui/*.ui

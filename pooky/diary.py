@@ -6,15 +6,18 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import appdirs
 
-from pooky.ui.main import Ui_MainWindow
+RESOURCES = os.path.dirname(__file__)
 
-
-RESOURCES = os.path.join(os.path.dirname(__file__))
-USER_DATA = appdirs.user_data_dir('pookys-diary')
+try:
+    from pooky.ui.main import Ui_MainWindow
+except _:
+    from PyQt5 import uic
+    Ui_MainWindow, _ = uic.loadUiType(os.path.join(RESOURCES, 'ui/main.ui'))
 
 
 class Strip:
     REMOTE_URL = 'https://d1ejxu6vysztl5.cloudfront.net/comics/garfield/{year:04d}/{year:04d}-{month:02d}-{day:02d}.gif'
+    USER_DATA = appdirs.user_data_dir('pookys-diary')
     LOCAL_DIR = os.path.join(USER_DATA, 'strips')
 
     def __init__(self, date):
