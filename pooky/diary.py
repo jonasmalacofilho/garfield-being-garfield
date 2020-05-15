@@ -10,7 +10,7 @@ RESOURCES = os.path.dirname(__file__)
 
 try:
     from pooky.ui.main import Ui_MainWindow
-except _:
+except ModuleNotFoundError:
     from PyQt5 import uic
     Ui_MainWindow, _ = uic.loadUiType(os.path.join(RESOURCES, 'ui/main.ui'))
 
